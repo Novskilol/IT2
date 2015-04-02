@@ -46,6 +46,7 @@ int test_suivant(){
        rat = expression_to_rationnel("(a.a)*.(b*.c)");
        numeroter_rationnel(rat);
        Ensemble * e = suivant(rat, 2);
+       rationnel_to_dot(rat,"bobbins");
        
        TEST(
           1
@@ -61,18 +62,32 @@ int test_suivant(){
        rat = expression_to_rationnel("(a.a)*.(b+c*).a.b*");
        numeroter_rationnel(rat);
        Ensemble * e = suivant(rat, 2);
+       rationnel_to_dot(rat,"broskis");
 
        TEST(
           1
           && est_dans_l_ensemble(e, 1)
-	  && ! est_dans_l_ensemble(e, 2)
+	  && !est_dans_l_ensemble(e, 2)
           && est_dans_l_ensemble(e, 3)
           && est_dans_l_ensemble(e, 4)
           && est_dans_l_ensemble(e, 5)
-	  // && ! est_dans_l_ensemble(e, 6)
+	  && ! est_dans_l_ensemble(e, 6)
           , result);
     }
-
+    {
+       Rationnel * rat;
+       rat = expression_to_rationnel("(a.a)*.(b*.c)*");
+       numeroter_rationnel(rat);
+       Ensemble * e = suivant(rat, 1);
+       rationnel_to_dot(rat,"newbornbro");
+       TEST(
+          1
+          && !est_dans_l_ensemble(e, 1)
+	  && est_dans_l_ensemble(e, 2)
+          && !est_dans_l_ensemble(e, 3)
+          && !est_dans_l_ensemble(e, 4)
+          , result);
+    }
     return result;
 }
 

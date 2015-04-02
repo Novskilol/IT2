@@ -51,6 +51,8 @@ int test_glushkov(){
        rat = expression_to_rationnel("(a.a)*.(b*.c)*");
        numeroter_rationnel(rat);
        Automate * automate = Glushkov(rat);
+       print_automate(automate);
+       rationnel_to_dot(rat,"johnnybobsen");
        
        TEST(
           1

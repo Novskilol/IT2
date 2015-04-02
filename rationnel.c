@@ -466,28 +466,32 @@ void suivantRecursif(Rationnel *rat,Ensemble *e,int p)
 {
    switch(rat->etiquette)
    {
-      case LETTRE:
-	//if (rat->position_min==p)
-         break;
-
-      case EPSILON:	
-         break;
-
       case UNION:
-	//suivantRecursif(rat->gauche,e,p);
-	//suivantRecursif(rat->droit,e,p);
+	suivantRecursif(rat->gauche,e,p);
+	suivantRecursif(rat->droit,e,p);
 	break;
 
       case CONCAT:
-	if (est_dans_l_ensemble(dernier(rat->gauche),p))
+	if(est_dans_l_ensemble(dernier(rat->gauche),p))
+	  {
 	  ajouter_elements(e,premier((rat->droit)));
-
-	suivantRecursif(rat->gauche,e,p);
+	  suivantRecursif(rat->gauche,e,p);
+	  return;
+	  }
+	if(p<=rat->gauche->position_max)
+	  suivantRecursif(rat->gauche,e,p);
+	else 
+	  suivantRecursif(rat->droit,e,p);
         break;
 
       case STAR:
-	ajouter_elements(e,premier((rat->gauche)));
-	//suivantRecursif(rat->gauche,e,p);
+	if (p<=rat->position_max || p>=rat->position_min)
+	  {
+	    if(est_dans_l_ensemble(dernier(rat->gauche),p))
+	      ajouter_elements(e,premier((rat->gauche)));
+	    else
+	      suivantRecursif(rat->gauche,e,p);
+	  }
         break;
          
       default:
@@ -523,11 +527,14 @@ Automate *Glushkov(Rationnel *rat)
   Automate *ret=creer_automate();
 
   //init
-  ajouter_etat(ret,0);
+  ajouter_etat_initial(ret,0);
   Ensemble_iterateur it1;
 
   //premiers
   Ensemble* p= premier(rat);
+  if (contient_mot_vide(rat)) {
+      ajouter_etat_final(ret, 0);
+   }
 
   for (it1 = premier_iterateur_ensemble(p); !iterateur_est_vide(it1); it1 = iterateur_suivant_ensemble(it1)) {
     ajouter_etat(ret, get_element(it1));
@@ -542,6 +549,7 @@ Automate *Glushkov(Rationnel *rat)
       ajouter_etat(ret, i);
       ajouter_transition(ret, i, getRatFromPos(rat, get_element(it1))->lettre, get_element(it1));
     }
+    liberer_ensemble(s);
   }
 
    // finaux
@@ -550,7 +558,8 @@ Automate *Glushkov(Rationnel *rat)
    for (it1 = premier_iterateur_ensemble(d); !iterateur_est_vide(it1); it1 = iterateur_suivant_ensemble(it1)) {
       ajouter_etat_final(ret, get_element(it1));
    }
-
+   liberer_ensemble(p);
+   liberer_ensemble(d);
    return ret;
   
   
