@@ -502,15 +502,59 @@ Ensemble *suivant(Rationnel *rat, int position)
   return e;
 }
 
+Rationnel *getRatFromPos(Rationnel *rat,int p){
+  Rationnel *retour=NULL;
+  if(rat->droit != NULL)
+    if((retour=getRatFromPos(rat->droit,p))!=NULL)
+      return retour;
+  if(rat->gauche != NULL)
+    if((retour=getRatFromPos(rat->gauche,p))!=NULL)
+      return retour;  
+  if (rat->etiquette == LETTRE && rat->position_min ==p)
+    return rat;
+  return retour;
+}
+
 Automate *Glushkov(Rationnel *rat)
 {
   /* on numérote le rationnel puis on le transforme 
      en automate de glushkov*/
   numeroter_rationnel(rat);
   Automate *ret=creer_automate();
-  if (rat->lettre!='\0')
-    ajouter_etat(ret,rat->position_min);
-  A_FAIRE_RETURN(NULL);
+
+  //init
+  ajouter_etat(ret,0);
+  Ensemble_iterateur it1;
+
+  //premiers
+  Ensemble* p= premier(rat);
+
+  for (it1 = premier_iterateur_ensemble(p); !iterateur_est_vide(it1); it1 = iterateur_suivant_ensemble(it1)) {
+    ajouter_etat(ret, get_element(it1));
+    ajouter_transition(ret, 0, getRatFromPos(rat, get_element(it1))->lettre, get_element(it1));
+   }
+
+  //suivants
+  for (int i = 1; i <=rat->position_max ; i++) {
+    Ensemble* s=suivant(rat, i);
+
+    for (it1 = premier_iterateur_ensemble(s); !iterateur_est_vide(it1); it1 = iterateur_suivant_ensemble(it1)) {
+      ajouter_etat(ret, i);
+      ajouter_transition(ret, i, getRatFromPos(rat, get_element(it1))->lettre, get_element(it1));
+    }
+  }
+
+   // finaux
+   Ensemble* d= dernier(rat);
+
+   for (it1 = premier_iterateur_ensemble(d); !iterateur_est_vide(it1); it1 = iterateur_suivant_ensemble(it1)) {
+      ajouter_etat_final(ret, get_element(it1));
+   }
+
+   return ret;
+  
+  
+  
 }
 
 bool meme_langage (const char *expr1, const char* expr2)

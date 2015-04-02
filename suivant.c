@@ -10,8 +10,6 @@ Rationnel *getRatRecursif(Rationnel *rat,position p){
       return retour;  
   if (rat->etiquette == LETTRE && rat->position ==p)
     return rat;
-
-
 }
 static void suivantRecursif(Rationnel *rat,Ensemble **e,Rat *init){
   if(rat->position_min == init->position_min)
