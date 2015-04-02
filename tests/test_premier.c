@@ -84,7 +84,7 @@ int test_premier(){
           && est_dans_l_ensemble(e, 3)
           && est_dans_l_ensemble(e, 4)
           && est_dans_l_ensemble(e, 5)
-          && est_dans_l_ensemble(e, 6)
+          && !est_dans_l_ensemble(e, 6)
           , result);
     }
 

@@ -431,21 +431,27 @@ Ensemble *premier(Rationnel *rat)
 
 static bool dernierRecursif(Rationnel *rat,Ensemble *e)
 {
-  bool estTrouveDernier=false;
+  bool estTrouveDernierDroit=false;
+  bool estTrouveDernierGauche=false;
   if (rat->droit!=NULL)
-    estTrouveDernier=dernierRecursif(rat->droit,e);
-  if (!estTrouveDernier||rat->etiquette==UNION)
+    estTrouveDernierDroit=dernierRecursif(rat->droit,e);
+  if (!estTrouveDernierDroit||rat->etiquette==UNION || rat->etiquette == STAR)
     {
       if(rat->gauche!=NULL)
-	estTrouveDernier=dernierRecursif(rat->gauche,e);
+	estTrouveDernierGauche=dernierRecursif(rat->gauche,e);
     }
-  if(rat->etiquette==STAR)
-    estTrouveDernier=false;
-  if (estTrouveDernier==false&&rat->etiquette==LETTRE){
-    ajouter_element(e,rat->position_min);
-    estTrouveDernier=true;
+  if(rat->etiquette==STAR){
+    estTrouveDernierDroit=false;
+
   }
-  return estTrouveDernier;
+  if (estTrouveDernierDroit==false&&rat->etiquette==LETTRE){
+    ajouter_element(e,rat->position_min);
+    estTrouveDernierDroit=true;
+  }
+  if(rat->etiquette == UNION){
+    return estTrouveDernierDroit && estTrouveDernierGauche;
+  }
+  return estTrouveDernierDroit;
 }
 
 Ensemble *dernier(Rationnel *rat)
@@ -466,14 +472,16 @@ void suivantRecursif(Rationnel *rat,Ensemble *e,int p)
          break;
 
       case UNION:
-	suivantRecursif(rat->gauche,e,p);
-	suivantRecursif(rat->droit,e,p);
+	//suivantRecursif(rat->gauche,e,p);
+	//suivantRecursif(rat->droit,e,p);
 	break;
 
       case CONCAT:
-	if (est_dans_l_ensemble(dernier(rat->gauche),p))
+	if (est_dans_l_ensemble(dernier(rat->gauche),p)){
 	  ajouter_elements(e,premier((rat->droit)));
-	suivantRecursif(rat->droit,e,p);
+	  suivantRecursif(rat->droit,e,p);
+	}
+	suivantRecursif(rat->gauche,e,p);
         break;
 
       case STAR:

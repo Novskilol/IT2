@@ -17,15 +17,30 @@ int test_dernier(){
        
        TEST(
           1
-          && est_dans_l_ensemble(e, 1)
-          && est_dans_l_ensemble(e, 2)
-          && est_dans_l_ensemble(e, 3)
-          && est_dans_l_ensemble(e, 4)
+          && !est_dans_l_ensemble(e, 1)
+          && !est_dans_l_ensemble(e, 2)
+          && !est_dans_l_ensemble(e, 3)
+          && !est_dans_l_ensemble(e, 4)
           && est_dans_l_ensemble(e, 5)
           && est_dans_l_ensemble(e, 6)
           , result);
     }
-
+    {
+       Rationnel * rat;
+       rat = expression_to_rationnel("(a.a)*.(b+c*)");
+       numeroter_rationnel(rat);
+       Ensemble * e = dernier(rat);
+       
+       TEST(
+          1
+	  && !est_dans_l_ensemble(e, 1)
+          && est_dans_l_ensemble(e, 2)
+          && est_dans_l_ensemble(e, 3)
+          && est_dans_l_ensemble(e, 4)
+	  //          && est_dans_l_ensemble(e, 5)
+          //&& est_dans_l_ensemble(e, 6)
+          , result);
+    }
     return result;
 }
 
