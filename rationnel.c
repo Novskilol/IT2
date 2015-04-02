@@ -294,11 +294,29 @@ void numeroter_rationnel(Rationnel *rat)
 
 bool contient_mot_vide(Rationnel *rat)
 {
-   A_FAIRE_RETURN(true);
+  bool contientEpsilonFilsGauche=false;
+  bool contientEpsilonFilsDroit=false;
+  /**
+   * On test d'abord pour le noeud courant .
+   */
+  if (rat->etiquette ==EPSILON)
+    return true;
+  /**
+  * Si le noeud courant ne contient pas epsilon , on le test récursivement
+  * sur les fils gauche et droit .
+  */
+  if(rat->gauche!=NULL)
+    contientEpsilonFilsGauche=contient_mot_vide(rat->gauche);
+   
+  if(rat->droit!=NULL)
+    contientEpsilonFilsDroit=contient_mot_vide(rat->droit);
+  
+  return contientEpsilonFilsDroit||contientEpsilonFilsGauche;
 }
 
 Ensemble *premier(Rationnel *rat)
 {
+  
    A_FAIRE_RETURN(NULL);
 }
 
