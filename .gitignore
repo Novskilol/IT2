@@ -1,5 +1,6 @@
 *.o
 tests/*.o 
+tests/*~
 *~
 *.mk
 *.a
