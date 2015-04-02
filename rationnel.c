@@ -459,13 +459,15 @@ void suivantRecursif(Rationnel *rat,Ensemble *e,int p)
    switch(rat->etiquette)
    {
       case LETTRE:
-	if (rat->position_min==p)
+	//if (rat->position_min==p)
          break;
 
       case EPSILON:	
          break;
 
       case UNION:
+	suivantRecursif(rat->gauche,e,p);
+	suivantRecursif(rat->droit,e,p);
 	break;
 
       case CONCAT:
@@ -476,6 +478,7 @@ void suivantRecursif(Rationnel *rat,Ensemble *e,int p)
 
       case STAR:
 	ajouter_elements(e,premier((rat->gauche)));
+	//suivantRecursif(rat->gauche,e,p);
         break;
          
       default:
