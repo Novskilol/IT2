@@ -31,14 +31,14 @@ int test_premier(){
 	int result = 1;
     {
        Rationnel * rat;
-       rat = expression_to_rationnel("a.b");
+       rat = expression_to_rationnel("a*+b");
        numeroter_rationnel(rat);
        Ensemble * e = premier(rat);
        
        TEST(
           1
           && est_dans_l_ensemble(e, 1)
-          && ! est_dans_l_ensemble(e, 2)
+          && est_dans_l_ensemble(e, 2)
           , result);
     }
 

@@ -403,7 +403,7 @@ static bool premierRecursif(Rationnel *rat,Ensemble *e)
        * Dans le cas ou l'expression gauche contient une étoile ou bien 
        * que l'étiquette courante est une étoile on regarde le fils droit .
        */
-      if(!estTrouvePremier || rat->etiquette == STAR || rat->etiquette == UNION)
+      if(!estTrouvePremier || rat->etiquette == UNION)
 	if (rat->droit != NULL)
 	  estTrouvePremier=premierRecursif(rat->droit,e);
       
@@ -429,60 +429,65 @@ Ensemble *premier(Rationnel *rat)
 
 }
 
-/* static bool dernierRecursif(Rationnel *rat,Ensemble *e) */
-/* { */
-/*   bool estTrouvePremier=false; */
-/*   /\** */
-/*    * Si le premier terme est une lettre on l'ajoute à l'ensemble et */
-/*    * l'on renvoie que le premier a été trouvé */
-/*    *\/ */
-/*   if(rat->etiquette == LETTRE){ */
-/*     ajouter_element(e,rat->position_min); // XXX rat->lettre ou &rat->lettre */
-/*     return true; */
-/*   } */
-/*   /\** */
-/*    * Autrement on cherche récursivement sur le fils gauche le premier. */
-/*    * Si il n'est pas trouvé ou bien que l'étiquette père est une étoile alors */
-/*    * on cherche récursivement sur le fils droit .  */
-/*    *\/ */
-/*   else  */
-/*     { */
-/*       /\** */
-/*        * estTrouverPremier peut être faux si l'expression gauche contient une  */
-/*        * étoile avant chaque feuille ou bien si l'expression n'est pas correcte */
-/*        *\/ */
-/*       if(rat->droit!=NULL) */
-/* 	estTrouvePremier=premierRecursif(rat->gauche,e); */
-      
-/*       /\** */
-/*        * Dans le cas ou l'expression gauche contient une étoile ou bien  */
-/*        * que l'étiquette courante est une étoile on regarde le fils droit . */
-/*        *\/ */
-/*       if(!estTrouvePremier || rat->etiquette == STAR || rat->etiquette == UNION) */
-/* 	if (rat->droit != NULL) */
-/* 	  estTrouvePremier=premierRecursif(rat->droit,e); */
-      
-/*       /\** */
-/*        * Si l'étiquette courante est une étoile , on renvoie  */
-/*        * que l'élément est encore à chercher .  */
-/*        *\/ */
-/*       if (rat->etiquette == STAR) */
-/* 	estTrouvePremier=false; */
-/*     } */
-/*   return estTrouvePremier; */
-/* } */
+static bool dernierRecursif(Rationnel *rat,Ensemble *e)
+{
+  bool estTrouveDernier=false;
+  if (rat->droit!=NULL)
+    estTrouveDernier=dernierRecursif(rat->droit,e);
+  if (!estTrouveDernier||rat->etiquette==UNION)
+    {
+      if(rat->gauche!=NULL)
+	estTrouveDernier=dernierRecursif(rat->gauche,e);
+    }
+  if(rat->etiquette==STAR)
+    estTrouveDernier=false;
+  if (estTrouveDernier==false&&rat->etiquette==LETTRE){
+    ajouter_element(e,rat->position_min);
+    estTrouveDernier=true;
+  }
+  return estTrouveDernier;
+}
 
 Ensemble *dernier(Rationnel *rat)
 {
-  /*Ensemble *e=creer_ensemble(NULL,NULL,NULL);
+  Ensemble *e=creer_ensemble(NULL,NULL,NULL);
   dernierRecursif(rat,e);
-  return e;*/
-  A_FAIRE_RETURN(NULL);
+  return e;
 }
-
-Ensemble *suivant(Rationnel *rat, int position)
+void suivantRecursif(Rationnel *rat,Ensemble *e,int p)
 {
-   A_FAIRE_RETURN(NULL);
+   switch(rat->etiquette)
+   {
+      case LETTRE:
+	if (rat->position_min==p)
+         break;
+
+      case EPSILON:	
+         break;
+
+      case UNION:
+	break;
+
+      case CONCAT:
+	if (est_dans_l_ensemble(dernier(rat->gauche),p))
+	  ajouter_elements(e,premier((rat->droit)));
+	suivantRecursif(rat->droit,e,p);
+        break;
+
+      case STAR:
+	ajouter_elements(e,premier((rat->gauche)));
+        break;
+         
+      default:
+         assert(false);
+         break;
+   }
+}
+Ensemble *suivant(Rationnel *rat, int position)
+{// XXX test pas passé
+  Ensemble *e=creer_ensemble(NULL,NULL,NULL);
+  suivantRecursif(rat,e,position);
+  return e;
 }
 
 Automate *Glushkov(Rationnel *rat)
