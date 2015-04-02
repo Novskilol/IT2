@@ -298,8 +298,9 @@ bool contient_mot_vide(Rationnel *rat)
   bool contientEpsilonFilsDroit=false;
   /**
    * On test d'abord pour le noeud courant .
+   * Le mot vide peut être présent directement ou bien il y a une étoile
    */
-  if (rat->etiquette ==EPSILON)
+  if (rat->etiquette ==EPSILON || rat->etiquette  == STAR)
     return true;
   /**
   * Si le noeud courant ne contient pas epsilon , on le test récursivement
