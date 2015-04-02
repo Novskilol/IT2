@@ -477,10 +477,9 @@ void suivantRecursif(Rationnel *rat,Ensemble *e,int p)
 	break;
 
       case CONCAT:
-	if (est_dans_l_ensemble(dernier(rat->gauche),p)){
+	if (est_dans_l_ensemble(dernier(rat->gauche),p))
 	  ajouter_elements(e,premier((rat->droit)));
-	  suivantRecursif(rat->droit,e,p);
-	}
+
 	suivantRecursif(rat->gauche,e,p);
         break;
 
