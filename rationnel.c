@@ -314,10 +314,70 @@ bool contient_mot_vide(Rationnel *rat)
   return contientEpsilonFilsDroit||contientEpsilonFilsGauche;
 }
 
+/**
+ * Cette fonction cherche récursivement les premier 
+ * ATTENTION , la valeur renvoyée par la fonction ne correspond
+ * pas au résultat mais sert juste à la récursion.
+ * Le résultat se retrouve dans Ensemble *e 
+ */
+static bool premierRecursif(Rationnel *rat,Ensemble *e)
+{
+  bool estTrouverPremier=false;
+
+  /**
+   * Si le premier terme est une lettre on l'ajoute à l'ensemble et
+   * l'on renvoie que le premier a été trouvé
+   */
+  if(rat->etiquette == LETTRE){
+    ajouter_element(e,rat->lettre); // XXX rat->lettre ou &rat->lettre
+    return true;
+  }
+  /**
+   * Autrement on cherche récursivement sur le fils gauche le premier.
+   * Si il n'est pas trouvé ou bien que l'étiquette père est une étoile alors
+   * on cherche récursivement sur le fils droit . 
+   */
+  else 
+    {
+      /**
+       * estTrouverPremier peut être faux si l'expression gauche contient une 
+       * étoile avant chaque feuille ou bien si l'expression n'est pas correcte
+       */
+      if(rat->gauche!=NULL)
+	estTrouverPremier=premierRecursif(rat->gauche,e);
+      
+      /**
+       * Dans le cas ou l'expression gauche contient une étoile ou bien 
+       * que l'étiquette courante est une étoile on regarde le fils droit .
+       */
+      if(!estTrouverPremier || rat->etiquette == STAR)
+	if (rat->droit != NULL)
+	  estTrouverPremier=premierRecursif(rat->droit,e);
+      
+      /**
+       * Si l'étiquette courante est une étoile , on renvoie 
+       * que l'élément est encore à chercher . 
+       */
+      if (rat->etiquette == STAR)
+	estTrouverPremier=false;
+	    
+
+      
+      
+    }
+  return estTrouverPremier;
+
+}
 Ensemble *premier(Rationnel *rat)
 {
-  
-   A_FAIRE_RETURN(NULL);
+  /**
+   * Attention l'ensemble renvoyé par cette fonction 
+   * devra être désalloué (vider_ensemble(Ensemble*))
+   */
+  Ensemble *e=creer_ensemble(NULL,NULL,NULL);
+  premierRecursif(rat,e);
+  return e;
+
 }
 
 Ensemble *dernier(Rationnel *rat)
