@@ -466,6 +466,12 @@ void suivantRecursif(Rationnel *rat,Ensemble *e,int p)
 {
    switch(rat->etiquette)
    {
+      case LETTRE:
+         break;
+
+      case EPSILON:	
+         break;
+
       case UNION:
 	suivantRecursif(rat->gauche,e,p);
 	suivantRecursif(rat->droit,e,p);
