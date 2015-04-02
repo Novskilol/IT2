@@ -876,7 +876,7 @@ Automate * creer_automate_deterministe( const Automate* automate ){
 }
 
 Automate * creer_automate_minimal( const Automate* automate ){
-  // miror -> deter -> miror
+  // miror -> deter -> miror -> deter
   Automate *res=miroir(automate);
   res=creer_automate_deterministe(res);
   res=miroir(res);

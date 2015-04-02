@@ -278,18 +278,54 @@ int rationnel_to_dot_aux(Rationnel *rat, FILE *output, int pere, int noeud_coura
       fprintf(output, "}\n");
    return noeud_courant;
 }
+static int max(int x, int y)
+{
+  return x>y ? x : y;
+}
+static int min(int x, int y)
+{
+  return x>y ? y : x;
+}
 
-static int i=0;
+int numeroter_rationnel_aux(Rationnel *rat,int i)
+{
+   switch(get_etiquette(rat))
+   {
+      case LETTRE:
+	rat->position_min=i;
+	rat->position_max=i;
+	i++;
+	return i;
+         break;
+
+      case EPSILON:
+         break;
+
+      case UNION:
+	rat->position_min=min(numeroter_rationnel_aux(rat->gauche,i),
+			      numeroter_rationnel_aux(rat->droit,i));
+	rat->position_max=max(numeroter_rationnel_aux(rat->gauche,i),
+			      numeroter_rationnel_aux(rat->droit,i));
+	break;
+
+      case CONCAT:
+         break;
+
+      case STAR:
+         break;
+         
+      default:
+         assert(false);
+         break;
+   }
+   return 0;
+}
+
 void numeroter_rationnel(Rationnel *rat)
 {
-  i++;
-  if(rat->gauche==NULL&&rat->droit==NULL)
-    {
-      // return i;
-    }
-  else if(rat->gauche!=NULL);
-      //automate *res=creer_automate(rat);
-  
+  /* On parcours le rationnel de manière préfixe en numérotant
+     les états qui sont des lettres */
+  numeroter_rationnel_aux(rat,0);
 }
 
 bool contient_mot_vide(Rationnel *rat)
@@ -393,11 +429,20 @@ Ensemble *suivant(Rationnel *rat, int position)
 
 Automate *Glushkov(Rationnel *rat)
 {
-   A_FAIRE_RETURN(NULL);
+  /* on numérote le rationnel puis on le transforme 
+     en automate de glushkov*/
+  numeroter_rationnel(rat);
+  Automate *ret=creer_automate();
+  if (rat->lettre!='\0')
+    ajouter_etat(ret,rat->position_min);
+  A_FAIRE_RETURN(NULL);
 }
 
 bool meme_langage (const char *expr1, const char* expr2)
 {
+  //
+  //rationnel *r1=expression_to_rationnel(expr1);
+  //rationnel *r2=expression_to_rationnel(expr2);
    A_FAIRE_RETURN(true);
 }
 
