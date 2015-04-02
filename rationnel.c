@@ -364,8 +364,10 @@ bool contient_mot_vide(Rationnel *rat)
    
   if(rat->droit!=NULL)
     contientEpsilonFilsDroit=contient_mot_vide(rat->droit);
-  
-  return contientEpsilonFilsDroit||contientEpsilonFilsGauche;
+  if(rat->etiquette == CONCAT)
+    return contientEpsilonFilsDroit && contientEpsilonFilsGauche;
+  else
+    return contientEpsilonFilsDroit||contientEpsilonFilsGauche;
 }
 
 /**
