@@ -278,6 +278,7 @@ int rationnel_to_dot_aux(Rationnel *rat, FILE *output, int pere, int noeud_coura
       fprintf(output, "}\n");
    return noeud_courant;
 }
+/*
 static int max(int x, int y)
 {
   return x>y ? x : y;
@@ -285,34 +286,49 @@ static int max(int x, int y)
 static int min(int x, int y)
 {
   return x>y ? y : x;
-}
+  }*/
 
 int numeroter_rationnel_aux(Rationnel *rat,int i)
 {
-   switch(get_etiquette(rat))
+  /*on utilise i pour connaitre le nombre de lettres visitées
+    on propage les min et max recursivement*/
+   switch(rat->etiquette)
    {
       case LETTRE:
+	i++;
 	rat->position_min=i;
 	rat->position_max=i;
-	i++;
 	return i;
          break;
 
       case EPSILON:
+	rat->position_min=0;
+	rat->position_max=0;
+	return 0;
          break;
 
       case UNION:
-	rat->position_min=min(numeroter_rationnel_aux(rat->gauche,i),
-			      numeroter_rationnel_aux(rat->droit,i));
-	rat->position_max=max(numeroter_rationnel_aux(rat->gauche,i),
-			      numeroter_rationnel_aux(rat->droit,i));
+	i=numeroter_rationnel_aux(rat->gauche,i);
+	i=numeroter_rationnel_aux(rat->droit,i);
+	rat->position_min=rat->gauche->position_min;
+	rat->position_max=rat->droit->position_max;
+	return i;
 	break;
 
       case CONCAT:
+        i=numeroter_rationnel_aux(rat->gauche,i);
+	i=numeroter_rationnel_aux(rat->droit,i);
+	rat->position_min=rat->gauche->position_min;
+	rat->position_max=rat->droit->position_max;
+	return i;
          break;
 
       case STAR:
-         break;
+	i=numeroter_rationnel_aux(rat->gauche,i);
+	rat->position_min=rat->gauche->position_min;
+	rat->position_max=rat->gauche->position_max;
+	return i;
+        break;
          
       default:
          assert(false);
@@ -325,7 +341,8 @@ void numeroter_rationnel(Rationnel *rat)
 {
   /* On parcours le rationnel de manière préfixe en numérotant
      les états qui sont des lettres */
-  numeroter_rationnel_aux(rat,0);
+  int i=0;
+  numeroter_rationnel_aux(rat,i);
 }
 
 bool contient_mot_vide(Rationnel *rat)
@@ -359,14 +376,13 @@ bool contient_mot_vide(Rationnel *rat)
  */
 static bool premierRecursif(Rationnel *rat,Ensemble *e)
 {
-  bool estTrouverPremier=false;
-
+  bool estTrouvePremier=false;
   /**
    * Si le premier terme est une lettre on l'ajoute à l'ensemble et
    * l'on renvoie que le premier a été trouvé
    */
   if(rat->etiquette == LETTRE){
-    ajouter_element(e,rat->lettre); // XXX rat->lettre ou &rat->lettre
+    ajouter_element(e,rat->position_min);
     return true;
   }
   /**
@@ -381,28 +397,24 @@ static bool premierRecursif(Rationnel *rat,Ensemble *e)
        * étoile avant chaque feuille ou bien si l'expression n'est pas correcte
        */
       if(rat->gauche!=NULL)
-	estTrouverPremier=premierRecursif(rat->gauche,e);
+	estTrouvePremier=premierRecursif(rat->gauche,e);
       
       /**
        * Dans le cas ou l'expression gauche contient une étoile ou bien 
        * que l'étiquette courante est une étoile on regarde le fils droit .
        */
-      if(!estTrouverPremier || rat->etiquette == STAR)
+      if(!estTrouvePremier || rat->etiquette == STAR || rat->etiquette == UNION)
 	if (rat->droit != NULL)
-	  estTrouverPremier=premierRecursif(rat->droit,e);
+	  estTrouvePremier=premierRecursif(rat->droit,e);
       
       /**
        * Si l'étiquette courante est une étoile , on renvoie 
        * que l'élément est encore à chercher . 
        */
       if (rat->etiquette == STAR)
-	estTrouverPremier=false;
-	    
-
-      
-      
+	estTrouvePremier=false;
     }
-  return estTrouverPremier;
+  return estTrouvePremier;
 
 }
 Ensemble *premier(Rationnel *rat)
@@ -417,9 +429,55 @@ Ensemble *premier(Rationnel *rat)
 
 }
 
+/* static bool dernierRecursif(Rationnel *rat,Ensemble *e) */
+/* { */
+/*   bool estTrouvePremier=false; */
+/*   /\** */
+/*    * Si le premier terme est une lettre on l'ajoute à l'ensemble et */
+/*    * l'on renvoie que le premier a été trouvé */
+/*    *\/ */
+/*   if(rat->etiquette == LETTRE){ */
+/*     ajouter_element(e,rat->position_min); // XXX rat->lettre ou &rat->lettre */
+/*     return true; */
+/*   } */
+/*   /\** */
+/*    * Autrement on cherche récursivement sur le fils gauche le premier. */
+/*    * Si il n'est pas trouvé ou bien que l'étiquette père est une étoile alors */
+/*    * on cherche récursivement sur le fils droit .  */
+/*    *\/ */
+/*   else  */
+/*     { */
+/*       /\** */
+/*        * estTrouverPremier peut être faux si l'expression gauche contient une  */
+/*        * étoile avant chaque feuille ou bien si l'expression n'est pas correcte */
+/*        *\/ */
+/*       if(rat->droit!=NULL) */
+/* 	estTrouvePremier=premierRecursif(rat->gauche,e); */
+      
+/*       /\** */
+/*        * Dans le cas ou l'expression gauche contient une étoile ou bien  */
+/*        * que l'étiquette courante est une étoile on regarde le fils droit . */
+/*        *\/ */
+/*       if(!estTrouvePremier || rat->etiquette == STAR || rat->etiquette == UNION) */
+/* 	if (rat->droit != NULL) */
+/* 	  estTrouvePremier=premierRecursif(rat->droit,e); */
+      
+/*       /\** */
+/*        * Si l'étiquette courante est une étoile , on renvoie  */
+/*        * que l'élément est encore à chercher .  */
+/*        *\/ */
+/*       if (rat->etiquette == STAR) */
+/* 	estTrouvePremier=false; */
+/*     } */
+/*   return estTrouvePremier; */
+/* } */
+
 Ensemble *dernier(Rationnel *rat)
 {
-   A_FAIRE_RETURN(NULL);
+  /*Ensemble *e=creer_ensemble(NULL,NULL,NULL);
+  dernierRecursif(rat,e);
+  return e;*/
+  A_FAIRE_RETURN(NULL);
 }
 
 Ensemble *suivant(Rationnel *rat, int position)

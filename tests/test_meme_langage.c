@@ -30,8 +30,10 @@
 int test_meme_langage(){
 	int result = 1;
     {
-       Rationnel *rat=expression_to_rationnel("a.(b.a)*");
+       Rationnel *rat=expression_to_rationnel("a.(b.a)*.(a+b)*");
        print_rationnel(rat);
+       numeroter_rationnel(rat);
+       rationnel_to_dot(rat,"johnsen");
        TEST(
           1
           && meme_langage("(a.b)*.a", "a.(b.a)*")
