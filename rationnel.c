@@ -364,8 +364,16 @@ bool contient_mot_vide(Rationnel *rat)
    
   if(rat->droit!=NULL)
     contientEpsilonFilsDroit=contient_mot_vide(rat->droit);
+  /**
+   * Dans le cas de concat le mot vide existe lorsque 
+   * le fils droit ET le fils gauche contiennent epsilon
+   *
+   */
   if(rat->etiquette == CONCAT)
     return contientEpsilonFilsDroit && contientEpsilonFilsGauche;
+  /**
+   * Dans le cas restant (+) il suffit que l'un des deux contienne epsilon 
+   */
   else
     return contientEpsilonFilsDroit||contientEpsilonFilsGauche;
 }
@@ -423,33 +431,55 @@ Ensemble *premier(Rationnel *rat)
 {
   /**
    * Attention l'ensemble renvoyé par cette fonction 
-   * devra être désalloué (vider_ensemble(Ensemble*))
+   * devra être désalloué (liberer/delivrer_ensemble(Ensemble*))
    */
   Ensemble *e=creer_ensemble(NULL,NULL,NULL);
   premierRecursif(rat,e);
   return e;
 
 }
-
+/**
+ * Cette fonction fait un parcours préfixe du rationnel pour 
+ * rajouté dans l'ensemble e dernier(rat) . La valeur retournée
+ * n'a pas d'importance .
+ */
 static bool dernierRecursif(Rationnel *rat,Ensemble *e)
 {
   bool estTrouveDernierDroit=false;
   bool estTrouveDernierGauche=false;
+  /**
+   * On fait un parcours suffixe
+   */
   if (rat->droit!=NULL)
     estTrouveDernierDroit=dernierRecursif(rat->droit,e);
+  /**
+   * Si le noeud droit n'as pas renvoyer vrai (effacable) ou bien que le noeud courant 
+   * est + ou * alors on regarde le fils gauche puisque le fils droit est effaçable
+   */
   if (!estTrouveDernierDroit||rat->etiquette==UNION || rat->etiquette == STAR)
     {
       if(rat->gauche!=NULL)
 	estTrouveDernierGauche=dernierRecursif(rat->gauche,e);
     }
+  /**
+   * Quoique puisse renvoyer les fils d'une étoile il resteront effaçable.
+   */
   if(rat->etiquette==STAR){
     estTrouveDernierDroit=false;
 
   }
+  /**
+   * Si on est sur une feuille alors on rajoute l'élément à la liste des dernier
+   * et on renvoie non effaçable (valeur qui pourra changer en remontant dans l'arbre).
+   */
   if (estTrouveDernierDroit==false&&rat->etiquette==LETTRE){
     ajouter_element(e,rat->position_min);
     estTrouveDernierDroit=true;
   }
+  /**
+   * Un + n'est pas effaçable si 
+   * son fils droit et son fils gauche ne sont pas effaçable.
+   */
   if(rat->etiquette == UNION){
     return estTrouveDernierDroit && estTrouveDernierGauche;
   }
@@ -482,7 +512,7 @@ void suivantRecursif(Rationnel *rat,Ensemble *e,int p)
 	  {
 	  ajouter_elements(e,premier((rat->droit)));
 	  suivantRecursif(rat->gauche,e,p);
-	  return;
+	  break;
 	  }
 	if(p<=rat->gauche->position_max)
 	  suivantRecursif(rat->gauche,e,p);
@@ -538,9 +568,9 @@ Automate *Glushkov(Rationnel *rat)
 
   //premiers
   Ensemble* p= premier(rat);
-  if (contient_mot_vide(rat)) {
+  if (contient_mot_vide(rat)) 
       ajouter_etat_final(ret, 0);
-   }
+   
 
   for (it1 = premier_iterateur_ensemble(p); !iterateur_est_vide(it1); it1 = iterateur_suivant_ensemble(it1)) {
     ajouter_etat(ret, get_element(it1));
