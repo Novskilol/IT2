@@ -616,13 +616,15 @@ struct sysautomate{
 };
 Systeme systeme(Automate *automate)
 {
-  Systeme s= malloc(sizeof(*s));
+
   int nbLigne=taille_ensemble(get_etats(automate));
+    Systeme s= malloc(sizeof(Rationnel**)*nbLigne);
+  printf("NBLIGNE %d",nbLigne);
   int nbColonne = nbLigne + 1;
   int i=0;
   int y=0;
   for( i = 0 ; i < nbLigne ; ++ i ){
-      s[i] = malloc(sizeof(*s[i])*nbColonne);
+      s[i] = malloc(sizeof(Rationnel*)*nbColonne);
       for ( y = 0 ; y < nbColonne ; ++ y ){
 	s[i][y]=NULL;
 
@@ -632,7 +634,13 @@ Systeme systeme(Automate *automate)
   void remplirSystemeDepuisTransition(int origine,char lettre,int fin,void *systeme)
   {
     Systeme s=(Systeme)systeme;
+    Rationnel *tmp=s[origine][fin];
+    if (origine == 6)
+      printf("ORIGIN==6");
     s[origine][fin] = Union(Lettre(lettre),s[origine][fin]);
+    if (origine == 6)
+      print_rationnel(s[origine][fin]);
+    free(tmp);
 
     
 
