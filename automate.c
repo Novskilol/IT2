@@ -229,6 +229,8 @@ Ensemble * delta_star(
 	return new;
 }
 
+
+
 void pour_toute_transition(
 	const Automate* automate,
 	void (* action )( int origine, char lettre, int fin, void* data ),

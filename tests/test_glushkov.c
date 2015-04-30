@@ -84,6 +84,18 @@ int test_glushkov(){
           && ! le_mot_est_reconnu(automate, "aaaabccaabbb")
           , result);
     }
+    {
+       Rationnel * rat;
+       rat = expression_to_rationnel("(a*.b*)*");
+       numeroter_rationnel(rat);
+       Automate * automate = Glushkov(rat);
+       
+       TEST(
+          1
+          && le_mot_est_reconnu(automate, "ab")
+          && le_mot_est_reconnu(automate, "babab")
+          , result);
+    }
     return result;
 }
 

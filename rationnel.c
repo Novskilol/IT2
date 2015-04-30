@@ -601,14 +601,101 @@ Automate *Glushkov(Rationnel *rat)
   
   
 }
+/*static void print_elt(const intptr_t cle)
+{
+  printf("cle : %"PRIxPTR "\n",cle);
+  }*/
+static Automate *complementaire(const Automate *automate)
+{
+  Automate * res = creer_automate();
+  
+  Ensemble_iterateur it1;
+  // On ajoute les états de l'automate
+  for(
+      it1 = premier_iterateur_ensemble( get_etats( automate )
+);
+      ! iterateur_ensemble_est_vide( it1 );
+      it1 = iterateur_suivant_ensemble( it1 )
+      ){
+    ajouter_etat(res, get_element( it1 ) );
+    if (!est_dans_l_ensemble(get_finaux(automate),get_element(it1)))
+      ajouter_etat_final(res,get_element(it1));
+    
+  }
+  // On ajoute les états initiaux
+  for(
+      it1 = premier_iterateur_ensemble( get_initiaux( automate ) );
+      ! iterateur_ensemble_est_vide( it1 );
+      it1 = iterateur_suivant_ensemble( it1 )
+      ){
+    ajouter_etat_initial( res, get_element( it1 ) );
+  }
+  
+  // On ajoute les lettres
+  for(
+      it1 = premier_iterateur_ensemble( get_alphabet( automate ) );
+      ! iterateur_ensemble_est_vide( it1 );
+      it1 = iterateur_suivant_ensemble( it1 )
+      ){
+    ajouter_lettre( res, (char) get_element( it1 ) );
+  }
+  // On ajoute les transitions
+  Table_iterateur it2;
+  for(
+      it2 = premier_iterateur_table( automate->transitions );
+      ! iterateur_est_vide( it2 );
+      it2 = iterateur_suivant_table( it2 )
+      ){
+    Cle * cle = (Cle*) get_cle( it2 );
+    Ensemble * fins = (Ensemble*) get_valeur( it2 );
+    for(
+	it1 = premier_iterateur_ensemble( fins );
+	! iterateur_ensemble_est_vide( it1 );
+	it1 = iterateur_suivant_ensemble( it1 )
+	){
+      int fin = get_element( it1 );
+      ajouter_transition( res, cle->origine, cle->lettre, fin );
+    }
+  }
+  return res;
+  
+}
 
 bool meme_langage (const char *expr1, const char* expr2)
-{
-  //
-  //rationnel *r1=expression_to_rationnel(expr1);
-  //rationnel *r2=expression_to_rationnel(expr2);
-   A_FAIRE_RETURN(true);
+{ 
+  Rationnel *r1=expression_to_rationnel(expr1);
+  Rationnel *r2=expression_to_rationnel(expr2);
+  
+  Automate *a1=Glushkov(r1);
+  Automate *a2=Glushkov(r2);
+  
+  const Automate *m1=creer_automate_minimal(a1);
+  const Automate *m2=creer_automate_minimal(a2);
+
+  Automate *m1bar=complementaire(m1);
+  Automate *m2bar=complementaire(m2);
+
+  Automate *inter1=creer_intersection_des_automates(m1bar,m2);
+  Automate *inter2=creer_intersection_des_automates(m2bar,m1);
+  
+  Automate *acces1=automate_accessible(inter1);
+  Automate *acces2=automate_accessible(inter2);
+
+  //print_ensemble(get_finaux(acces1),&print_elt);
+  // print_ensemble(get_finaux(acces2),&print_elt);
+  
+  int res=((taille_ensemble(get_finaux(acces1))==0)&&(taille_ensemble(get_finaux(acces2))==0));
+  liberer_automate(a1);
+  liberer_automate(a2);
+  liberer_automate(m1bar);
+  liberer_automate(m2bar);
+  liberer_automate(inter1);
+  liberer_automate(inter2);
+  liberer_automate(acces1);
+  liberer_automate(acces2);
+  return res;
 }
+
 struct sysautomate{
   Systeme sys;
   Automate *automate;
