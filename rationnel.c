@@ -619,7 +619,7 @@ Systeme systeme(Automate *automate)
 
   int nbLigne=taille_ensemble(get_etats(automate));
     Systeme s= malloc(sizeof(Rationnel**)*nbLigne);
-  printf("NBLIGNE %d",nbLigne);
+
   int nbColonne = nbLigne + 1;
   int i=0;
   int y=0;
@@ -635,11 +635,7 @@ Systeme systeme(Automate *automate)
   {
     Systeme s=(Systeme)systeme;
     Rationnel *tmp=s[origine][fin];
-    if (origine == 6)
-      printf("ORIGIN==6");
     s[origine][fin] = Union(Lettre(lettre),s[origine][fin]);
-    if (origine == 6)
-      print_rationnel(s[origine][fin]);
     free(tmp);
 
     
