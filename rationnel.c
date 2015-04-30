@@ -609,10 +609,51 @@ bool meme_langage (const char *expr1, const char* expr2)
   //rationnel *r2=expression_to_rationnel(expr2);
    A_FAIRE_RETURN(true);
 }
+struct sysautomate{
+  Systeme sys;
+  Automate *automate;
 
+};
 Systeme systeme(Automate *automate)
 {
-   A_FAIRE_RETURN(NULL);
+  Systeme s= malloc(sizeof(*s));
+  int nbLigne=taille_ensemble(get_etats(automate));
+  int nbColonne = nbLigne + 1;
+  int i=0;
+  int y=0;
+  for( i = 0 ; i < nbLigne ; ++ i ){
+      s[i] = malloc(sizeof(*s[i])*nbColonne);
+      for ( y = 0 ; y < nbColonne ; ++ y ){
+	s[i][y]=NULL;
+
+      }
+      
+  }
+  void remplirSystemeDepuisTransition(int origine,char lettre,int fin,void *systeme)
+  {
+    Systeme s=(Systeme)systeme;
+    s[origine][fin] = Union(Lettre(lettre),s[origine][fin]);
+
+    
+
+  }
+  void remplirSystemeDepuisFinaux(intptr_t  element,void *systemeAut)
+  {
+    
+    Systeme s=(((struct sysautomate*)systemeAut)->sys);
+    Automate *a=(((struct sysautomate*)systemeAut)->automate);
+    int maxColonne=taille_ensemble(get_etats(a))+1;
+    s[element][maxColonne-1]=Epsilon();
+     
+
+  }
+  pour_toute_transition(automate,remplirSystemeDepuisTransition,s);
+
+  Ensemble *etatFinaux=automate->finaux;
+  struct sysautomate tmpSysAutomate={s,automate};
+  pour_tout_element(etatFinaux,remplirSystemeDepuisFinaux,&tmpSysAutomate);
+  return s;
+  
 }
 
 void print_ligne(Rationnel **ligne, int n)
@@ -647,7 +688,7 @@ Rationnel **substituer_variable(Rationnel **ligne, int numero_variable, Rationne
 
 Systeme resoudre_systeme(Systeme systeme, int n)
 {
-   A_FAIRE_RETURN(NULL);
+     A_FAIRE_RETURN(NULL);
 }
 
 Rationnel *Arden(Automate *automate)
