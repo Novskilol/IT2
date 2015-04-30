@@ -597,9 +597,6 @@ Automate *Glushkov(Rationnel *rat)
    liberer_ensemble(p);
    liberer_ensemble(d);
    return ret;
-  
-  
-  
 }
 /*static void print_elt(const intptr_t cle)
 {
@@ -714,29 +711,19 @@ Systeme systeme(Automate *automate)
       s[i] = malloc(sizeof(Rationnel*)*nbColonne);
       for ( y = 0 ; y < nbColonne ; ++ y ){
 	s[i][y]=NULL;
-
-      }
-      
+      } 
   }
   void remplirSystemeDepuisTransition(int origine,char lettre,int fin,void *systeme)
   {
     Systeme s=(Systeme)systeme;
-    Rationnel *tmp=s[origine][fin];
     s[origine][fin] = Union(Lettre(lettre),s[origine][fin]);
-    free(tmp);
-
-    
-
   }
   void remplirSystemeDepuisFinaux(intptr_t  element,void *systemeAut)
-  {
-    
+  {  
     Systeme s=(((struct sysautomate*)systemeAut)->sys);
     Automate *a=(((struct sysautomate*)systemeAut)->automate);
     int maxColonne=taille_ensemble(get_etats(a))+1;
     s[element][maxColonne-1]=Epsilon();
-     
-
   }
   pour_toute_transition(automate,remplirSystemeDepuisTransition,s);
 
@@ -779,7 +766,38 @@ Rationnel **substituer_variable(Rationnel **ligne, int numero_variable, Rationne
 
 Systeme resoudre_systeme(Systeme systeme, int n)
 {
-     A_FAIRE_RETURN(NULL);
+  int i=0;
+  int j=0;
+  int nbCol=n+1;
+  while (i<n*nbCol)
+    {
+      i=i%nbCol;
+      if (i==0)
+	{
+	  ++j;
+	  referent=systeme[i][j];
+	}
+      if (j==i)
+	{
+	  if (systeme[i][j]!=NULL)
+	    {
+	      Rationnel *rat=systeme[i][j];
+	      rat=Star(rat);
+	      
+	      int k=0;
+	      Rationnel *unionTotal=rationnel(EPSILON,0,0,0,NULL,NULL,NULL,NULL);
+	      for(;k<nbCol;++k)
+		{
+		  if(k==i)
+		    k++;
+		  UNION(unionTotal,systeme[k][i]);
+		}
+	      Rationnel *newratconc=rationnel(CONCAT,0,0,0,NULL,newrat
+					      ,NULL,NULL);
+	    }
+	}
+      ++i;
+    }
 }
 
 Rationnel *Arden(Automate *automate)
