@@ -753,7 +753,12 @@ void print_systeme(Systeme systeme, int n)
       print_ligne(systeme[i], n);
    }
 }
-
+/**
+resoudre_variable_arden parcours la ligne, recherche le numéro de la variable,
+si il la trouve il met le tout dans une étoile et reevalue la ligne en fonction
+des autres Xi qui sont sur la ligne en se concaténant avec puis libère la case utilisée
+par arden
+ */
 Rationnel **resoudre_variable_arden(Rationnel **ligne, int numero_variable, int n)
 {
   Rationnel *rat=ligne[numero_variable];
@@ -777,7 +782,10 @@ Rationnel **resoudre_variable_arden(Rationnel **ligne, int numero_variable, int 
     }
   return ligne;
 }
-
+/**
+substituer_variable remplace la variable numero_variable présente dans la ligne par la concaténation
+de cette case et de la ligne valeur_variable tout en remettant chacun dans la bonne case
+ */
 Rationnel **substituer_variable(Rationnel **ligne, int numero_variable, Rationnel **valeur_variable, int n)
 {
   Rationnel *ratTarget=ligne[numero_variable];
@@ -789,7 +797,7 @@ Rationnel **substituer_variable(Rationnel **ligne, int numero_variable, Rationne
 	{
 	  if (cur->etiquette==EPSILON)
 	    {
-	      ligne[k]=Union(ratTarget,ligne[k]);
+	      ligne[k]=ratTarget;
 	    }
 	  else
 	    {
@@ -798,20 +806,22 @@ Rationnel **substituer_variable(Rationnel **ligne, int numero_variable, Rationne
 	    }
 	}
     }
-  ligne[numero_variable]=NULL;
   return NULL;
 }
-
+/**
+resoudre_systeme résout arden n fois et substitue n fois
+pour obtenir un système stable
+ */
 Systeme resoudre_systeme(Systeme systeme, int n)
 {
-  int j=0;
-  for(;j<n;++j)
+  int i=0;
+  for(;i<n;++i)
     {
-      resoudre_variable_arden(systeme[j],j,n+1); 
-    }
-  j=0;
-  for(;j<n;++j)
-    {
+      int j=0;
+      for(;j<n;++j)
+	{
+	  resoudre_variable_arden(systeme[j],j,n+1); 
+	}
       int k=0;
       for(;k<n;++k)
 	{
@@ -822,13 +832,16 @@ Systeme resoudre_systeme(Systeme systeme, int n)
   return NULL;
 }
 
+/**
+Arden transforme un automate en système puis le résout et envoie 
+le rationnel obtenu sur la ligne X0
+ */
 Rationnel *Arden(Automate *automate)
 {
   Systeme systemed=systeme(automate);
   int nbLigne=taille_ensemble(get_etats(automate));
-  print_systeme(systemed,nbLigne);
   resoudre_systeme(systemed,nbLigne);
-  print_systeme(systemed,nbLigne);
+  return systemed[0][nbLigne];
   return NULL;
 }
 
