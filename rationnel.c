@@ -762,18 +762,15 @@ Rationnel **resoudre_variable_arden(Rationnel **ligne, int numero_variable, int 
       rat=Star(rat);
 	      
       int k=0;
-      Rationnel *unionTotal=rationnel(EPSILON,0,0,0,NULL,NULL,NULL,NULL);
-      for(;k<n;++k)
+      for(;k<n+1;++k)
 	{
-	  if(k==numero_variable)
-	    continue;
-	  if(ligne[k]!=NULL)
-	    {
-	    unionTotal=Union(unionTotal,ligne[k]);
-	    ligne[k]=NULL;
+	  Rationnel *cur=ligne[k];
+	  if (cur!=NULL)
+	    { 
+	      ligne[k]=Concat(rat,cur);
 	    }
 	}
-      ligne[numero_variable]=Concat(rat,unionTotal);    
+      ligne[numero_variable]=NULL;    
     }
   return ligne;
 }
@@ -782,7 +779,7 @@ Rationnel **substituer_variable(Rationnel **ligne, int numero_variable, Rationne
 {
   Rationnel *ratTarget=ligne[numero_variable];
   int k=0;
-  for(;k<n;++k)
+  for(;k<n+1;++k)
     {
       Rationnel *cur=valeur_variable[k];
       if (cur!=NULL)
@@ -791,6 +788,7 @@ Rationnel **substituer_variable(Rationnel **ligne, int numero_variable, Rationne
 	ligne[k]=Union(provisoire,ligne[k]);
 	}
     }
+  ligne[numero_variable]=NULL;
   return NULL;
 }
 
@@ -799,17 +797,18 @@ Systeme resoudre_systeme(Systeme systeme, int n)
   int j=0;
   for(;j<n;++j)
     {
-      resoudre_variable_arden(systeme[j],j,n+1);
+      resoudre_variable_arden(systeme[j],j,n+1); 
+    }
+  j=0;
+  for(;j<n;++j)
+    {
       int k=0;
       for(;k<n;++k)
 	{
 	  if(k!=j)
-	    {
-	      substituer_variable(systeme[k],j,systeme[j],n);
-	    }
+	    substituer_variable(systeme[0],k,systeme[k],n);
 	}
     }
-  
   return NULL;
 }
 
