@@ -767,7 +767,10 @@ Rationnel **resoudre_variable_arden(Rationnel **ligne, int numero_variable, int 
 	  Rationnel *cur=ligne[k];
 	  if (cur!=NULL)
 	    { 
-	      ligne[k]=Concat(rat,cur);
+	      if (cur->etiquette==EPSILON)		
+		ligne[k]=rat;
+	      else
+		ligne[k]=Concat(rat,cur);
 	    }
 	}
       ligne[numero_variable]=NULL;    
@@ -784,8 +787,15 @@ Rationnel **substituer_variable(Rationnel **ligne, int numero_variable, Rationne
       Rationnel *cur=valeur_variable[k];
       if (cur!=NULL)
 	{
-	Rationnel *provisoire=Concat(ratTarget,cur);
-	ligne[k]=Union(provisoire,ligne[k]);
+	  if (cur->etiquette==EPSILON)
+	    {
+	      ligne[k]=Union(ratTarget,ligne[k]);
+	    }
+	  else
+	    {
+	      Rationnel *provisoire=Concat(ratTarget,cur);
+	      ligne[k]=Union(provisoire,ligne[k]);
+	    }
 	}
     }
   ligne[numero_variable]=NULL;

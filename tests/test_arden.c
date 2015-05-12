@@ -29,10 +29,35 @@ int test_arden(){
 	int result = 1;
 	
 	{
-		Rationnel * expression2 = expression_to_rationnel( "a.b" );
+	        Rationnel * expression2 = expression_to_rationnel( "(a*+b)" );
+
 		Automate * automate2 = Glushkov( expression2 );
 		print_automate(automate2);
-		Arden(automate2);
+
+		const Automate *m2=creer_automate_minimal(automate2);
+		printf("automate m2: ");
+		print_automate(m2);
+
+		Systeme systemed=systeme(automate2);
+		int nbLigne=taille_ensemble(get_etats(automate2));
+		print_systeme(systemed,nbLigne);
+		
+		/*resoudre_variable_arden(systemed[1],1,nbLigne);
+		substituer_variable(systemed[0], 1,systemed[1] , nbLigne);
+		substituer_variable(systemed[0], 2,systemed[2] , nbLigne);
+		resoudre_systeme(systemed,nbLigne);*/
+		
+		resoudre_systeme(systemed,nbLigne);
+
+		
+		print_systeme(systemed,nbLigne);
+
+		Rationnel *ret=systemed[0][nbLigne];
+
+		Automate *retaut=Glushkov(ret);
+		const Automate *m1=creer_automate_minimal(retaut);
+		printf("automate m1: ");
+		print_automate(m1);
 		TEST(
 		     1
 		     , result

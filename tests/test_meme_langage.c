@@ -26,7 +26,7 @@
 
 int test_meme_langage(){
 	int result = 1;
-    {
+	/*{
        bool test1 = meme_langage("a", "a");
        bool test2 = meme_langage("a", "b");
        bool test3 = meme_langage("a.(b.a)*", "(a.b)*.a");
@@ -39,6 +39,22 @@ int test_meme_langage(){
           , result
        );
 
+    }*/
+    {
+      Rationnel *r1=expression_to_rationnel("a+b");
+      
+      Automate *a1=Glushkov(r1);
+
+      print_automate(a1);
+
+      const Automate *m1=creer_automate_minimal(a1);
+
+      print_automate(m1);
+      
+      TEST(
+          1
+          , result
+       );
     }
 
     return result;

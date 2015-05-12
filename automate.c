@@ -880,15 +880,10 @@ Automate * creer_automate_deterministe( const Automate* automate ){
 Automate * creer_automate_minimal( const Automate* automate ){
   // miror -> deter -> miror -> deter
   Automate *res=miroir(automate);
-  print_automate(res);
   res=creer_automate_deterministe(res);
-  print_automate(res);
-  res=automate_accessible(res);
   res=miroir(res);
-  res=automate_accessible(res);
   res=creer_automate_deterministe(res);
-  res=automate_accessible(res);
-  print_automate(res);
   return res;
 }
+
 
