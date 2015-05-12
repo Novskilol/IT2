@@ -756,52 +756,70 @@ void print_systeme(Systeme systeme, int n)
 
 Rationnel **resoudre_variable_arden(Rationnel **ligne, int numero_variable, int n)
 {
-   A_FAIRE_RETURN(NULL);
+  Rationnel *rat=ligne[numero_variable];
+  if (rat!=NULL)
+    {
+      rat=Star(rat);
+	      
+      int k=0;
+      Rationnel *unionTotal=rationnel(EPSILON,0,0,0,NULL,NULL,NULL,NULL);
+      for(;k<n;++k)
+	{
+	  if(k==numero_variable)
+	    continue;
+	  if(ligne[k]!=NULL)
+	    {
+	    unionTotal=Union(unionTotal,ligne[k]);
+	    ligne[k]=NULL;
+	    }
+	}
+      ligne[numero_variable]=Concat(rat,unionTotal);    
+    }
+  return ligne;
 }
 
 Rationnel **substituer_variable(Rationnel **ligne, int numero_variable, Rationnel **valeur_variable, int n)
 {
-   A_FAIRE_RETURN(NULL);
+  Rationnel *ratTarget=ligne[numero_variable];
+  int k=0;
+  for(;k<n;++k)
+    {
+      Rationnel *cur=valeur_variable[k];
+      if (cur!=NULL)
+	{
+	Rationnel *provisoire=Concat(ratTarget,cur);
+	ligne[k]=Union(provisoire,ligne[k]);
+	}
+    }
+  return NULL;
 }
 
 Systeme resoudre_systeme(Systeme systeme, int n)
 {
-  int i=0;
   int j=0;
-  int nbCol=n+1;
-  while (i<n*nbCol)
+  for(;j<n;++j)
     {
-      i=i%nbCol;
-      if (i==0)
+      resoudre_variable_arden(systeme[j],j,n+1);
+      int k=0;
+      for(;k<n;++k)
 	{
-	  ++j;
-	  referent=systeme[i][j];
-	}
-      if (j==i)
-	{
-	  if (systeme[i][j]!=NULL)
+	  if(k!=j)
 	    {
-	      Rationnel *rat=systeme[i][j];
-	      rat=Star(rat);
-	      
-	      int k=0;
-	      Rationnel *unionTotal=rationnel(EPSILON,0,0,0,NULL,NULL,NULL,NULL);
-	      for(;k<nbCol;++k)
-		{
-		  if(k==i)
-		    k++;
-		  UNION(unionTotal,systeme[k][i]);
-		}
-	      Rationnel *newratconc=rationnel(CONCAT,0,0,0,NULL,newrat
-					      ,NULL,NULL);
+	      substituer_variable(systeme[k],j,systeme[j],n);
 	    }
 	}
-      ++i;
     }
+  
+  return NULL;
 }
 
 Rationnel *Arden(Automate *automate)
 {
-   A_FAIRE_RETURN(NULL);
+  Systeme systemed=systeme(automate);
+  int nbLigne=taille_ensemble(get_etats(automate));
+  print_systeme(systemed,nbLigne);
+  resoudre_systeme(systemed,nbLigne);
+  print_systeme(systemed,nbLigne);
+  return NULL;
 }
 

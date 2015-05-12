@@ -18,9 +18,6 @@
  *    along with this Library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file meme_langage.c */ 
-
-#include <automate.h>
 #include <rationnel.h>
 #include <ensemble.h>
 #include <outils.h>
@@ -30,18 +27,18 @@
 int test_meme_langage(){
 	int result = 1;
     {
-       Rationnel *rat=expression_to_rationnel("a.(b.a)*.(a+b)*");
-       print_rationnel(rat);
-       numeroter_rationnel(rat);
-       rationnel_to_dot(rat,"johnsen");
+       bool test1 = meme_langage("a", "a");
+       bool test2 = meme_langage("a", "b");
+       bool test3 = meme_langage("a.(b.a)*", "(a.b)*.a");
+       
        TEST(
           1
-          && meme_langage("(a.b)*.a", "a.(b.a)*")
-          && meme_langage("(a*.b*)*", "(a+b)*")
-          && meme_langage("(a*.b*)*", "(a+b*)*")
-          && meme_langage("(a*.b*)*", "(a*+b*)*")
-          && ! meme_langage("(a*.b*)*", "(a*+b*)")
-          , result);
+          && test1
+          && ! test2
+          && test3
+          , result
+       );
+
     }
 
     return result;
@@ -54,3 +51,5 @@ int main(int argc, char *argv[])
    
    return 0;
 }
+
+
